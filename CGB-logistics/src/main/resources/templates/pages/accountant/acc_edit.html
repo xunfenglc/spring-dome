@@ -1,0 +1,156 @@
+<!-- Horizontal Form -->
+ <div class="box box-info">
+      <div class="box-header with-border">
+        <h3 class="box-title">更新订单</h3>
+      </div>
+      <!-- /.box-header -->
+      <!-- form start -->
+      <form class="form-horizontal">
+        <div class="box-body">
+        
+          <div class="form-group">
+            <label for="customerNameId" class="col-sm-2 control-label">客户名</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="customerName" id="customerNameId" placeholder="客户名">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="typeId" class="col-sm-2 control-label">订单类型</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="type" id="typeId" placeholder="订单类型">
+            </div>
+          </div>
+          
+          <div class="form-group">
+				<label for="orderPriceId" class="col-sm-2 control-label">订单金额</label>
+				<div class="col-sm-10">
+              <input type="text" class="form-control" name="orderPrice" id="orderPriceId" placeholder="订单金额">
+            </div>
+		  </div>
+		  
+		  <div class="form-group">
+				<label for="costId" class="col-sm-2 control-label">送货费用</label>
+				<div class="col-sm-10">
+              <input type="text" class="form-control" name="cost" id="costId" placeholder="送货费用">
+            </div>
+		  </div>
+		  
+		  <div class="form-group">
+				<label for="incomeId" class="col-sm-2 control-label">已收款</label>
+				<div class="col-sm-10">
+              <input type="text" class="form-control" name="income" id="incomeId" placeholder="已收款">
+            </div>
+		  </div>
+		  
+		  <div class="form-group">
+				<label for="arrearsId" class="col-sm-2 control-label">未收款</label>
+				<div class="col-sm-10">
+              <input type="text" class="form-control" name="arrears" id="arrearsId" placeholder="未收款">
+            </div>
+		  </div>
+		  
+		  <div class="form-group">
+				<label for="profitsId" class="col-sm-2 control-label">订单利润</label>
+				<div class="col-sm-10">
+              <input type="text" class="form-control" name="profits" id="profitsId" placeholder="订单利润">
+            </div>
+		  </div>
+		  
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer">
+          <button type="button" class="btn btn-default btn-cancel">Cancel</button>
+          <button type="button" class="btn btn-info pull-right btn-save">Save</button>
+        </div>
+        <!-- /.box-footer -->
+      </form>
+    </div>
+    <script type="text/javascript" src="bower_components/ztree/jquery.ztree.all.min.js"></script>
+    <script type="text/javascript">
+    $(function(){
+    	debugger
+    	//异步加载底订单信息,初始化页面菜单
+    	//doFindObjectById();
+    	doInitEditFormData();
+    	$(".box-footer")
+    	.on("click",".btn-save",doSaveOrUpdate)
+    	.on("click",".btn-cancel",doCancel);
+    	
+    });
+    function doInitEditFormData(data){
+    	debugger
+    	var data=$("#mainContentId").data("rowData");
+        if(!data)return;
+    	console.log("data",data);
+    	//1.初始化角色自身信息
+    	$("#customerNameId").val(data.Array[0].customerName);
+    	$("#typeId").val(data.type);
+    	$("#orderPriceId").val(data.orderPrice);
+    	$("#costId").val(data.cost);
+    	$("#incomeId").val(data.income);
+    	$("#arrearsId").val(data.arrears);
+    	$("#profitsId").val(data.profits);
+    }
+    function doCancel(){
+    	var url="accountant/acc_list";
+    	$("#mainContentId")
+    	.load(url,function(){
+    	  $("#mainContentId").removeData();
+    	});
+    }
+    function doSaveOrUpdate(){
+    	
+    	//1.参数(表单数据)
+    	var params=doGetEditFormData();
+    	if(!params.profits.trim()){
+    		alert("利润不能为空");
+    		return;
+    	}
+    	var data=$("#mainContentId").data("data");
+    	if(data)params.id=data.id;
+    	//2.url
+    	var insertUrl="accountant/doSaveObject";
+    	var updateUrl="accountant/doUpdateObject";
+    	var url=data?updateUrl:insertUrl;
+    	//3.ajax request
+    	$.post(url,params,function(result){
+    		if(result.state==1){
+    		   alert(result.message);
+    		   doCancel();
+    		}else{
+    		   alert(result.message);
+    		}
+    	})
+    }
+    function doGetEditFormData(){
+    	//1.获取角色自身信息,利润没有自动计算
+    	var params={
+    			customerName:$("#customerNameId").val(),
+    			type:$("#typeId").val(),
+    			orderPrice:$("#orderPriceId").val(),
+    			cost:$("#costId").val(),
+    			income:$("#incomeId").val(),
+    			arrears:$("#arrearsId").val(),
+    			profits:$("#profitsId").val()
+    	}
+    	return params;
+    }
+    function doFindObjectById() {
+		debugger
+		console.log(result)
+    	//显示div
+		var url = "accountant/doFindObjectById";
+		//异步加载数据,并初始化数据
+		$.getJSON(url,function(result){
+			if (result.state == 1) {
+				doInitEditFormData(Data);
+			} else {
+				doGetEditFormData();
+			}
+		 });
+		console.log(result)
+	}
+    
+   
+</script>
